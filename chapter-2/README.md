@@ -1,60 +1,87 @@
 # Chapter 2: Multi-armed Bandits
 
-## Epsilon-Greedy Bandit Simulation
+## Contents
 
-This simulation demonstrates the epsilon-greedy action selection strategy on a 10-armed bandit problem.
+| File | Description |
+|------|-------------|
+| `epsilon_greedy_bandit.py` | ε-greedy comparison across action value distributions |
+| `exercise_2_5_nonstationary.py` | Sample-average vs constant step-size on nonstationary bandit |
+| `exercise_2_8_ucb_analysis.py` | UCB action selection simulation (1000 runs) |
+| `exercise_2_10_associative_search.py` | Contextual bandit / associative search |
+| `exercise_2_11_parameter_study.py` | Parameter study for nonstationary bandit (vectorized) |
+| `EXERCISE.md` | Exercise solutions and notes |
 
-### Running the Simulation
+---
+
+## Epsilon-Greedy Bandit
+
+Compares ε-greedy (ε = 0, 0.01, 0.05, 0.1, 0.2, 0.5) on 10-armed bandit with different q*(a) distributions.
 
 ```bash
 python3 epsilon_greedy_bandit.py
 ```
 
-This generates the following results:
+| Distribution | q*(a) | Result |
+|--------------|-------|--------|
+| Gaussian | N(0, 1) | ![](epsilon_greedy_gaussian.png) |
+| Uniform | evenly spaced [-2, 2] | ![](epsilon_greedy_uniform.png) |
+| Random | Uniform(-2, 2) | ![](epsilon_greedy_random.png) |
 
 ---
 
-### Gaussian Distribution Results
+## Exercise 2.5: Nonstationary Bandit
 
-Action values are sampled from a standard normal distribution N(0, 1), creating a realistic scenario where some arms are naturally better than others with varying degrees of separation.
+Demonstrates sample-average failure on nonstationary problems where q*(a) takes random walks.
 
-![Gaussian Distribution Results](epsilon_greedy_gaussian.png)
+```bash
+python3 exercise_2_5_nonstationary.py
+```
 
----
+![](exercise_2_5_nonstationary.png)
 
-### Uniform Distribution Results
-
-Action values are evenly spaced in the range [-2, 2], providing a controlled experiment where the gap between optimal and suboptimal actions is consistent and predictable.
-
-![Uniform Distribution Results](epsilon_greedy_uniform.png)
+**Key insight:** Constant step-size (α=0.1) tracks changes; sample-average cannot adapt.
 
 ---
 
-### Random Uniform Distribution Results
+## Exercise 2.8: UCB Analysis
 
-Action values are randomly sampled from Uniform(-2, 2), similar to Gaussian but with bounded values and no clustering around zero.
+UCB action selection: `A = argmax[Q(a) + c√(ln(t)/N(a))]`
 
-![Random Uniform Distribution Results](epsilon_greedy_random.png)
+```bash
+python3 exercise_2_8_ucb_analysis.py
+```
+
+![](exercise_2_8_ucb_analysis.png)
+
+**Key insight:** UCB explores all arms first (steps 1-10), spikes at step 11, then gradually improves.
 
 ---
 
-### Parameters
+## Exercise 2.10: Associative Search
 
-- **Epsilon values**: 0, 0.01, 0.05, 0.1, 0.2, 0.5
-- **Number of arms**: 10
-- **Steps per run**: 1000
-- **Number of runs**: 2000 (averaged)
+2-armed bandit with context (Case A or B). Shows value of contextual information.
 
-### Action Value Distributions
+```bash
+python3 exercise_2_10_associative_search.py
+```
 
-| Distribution | Description |
-|--------------|-------------|
-| Gaussian | q*(a) ~ N(0, 1) |
-| Uniform | q*(a) evenly spaced in [-2, 2] |
-| Random | q*(a) ~ Uniform(-2, 2) |
+![](exercise_2_10_associative_search.png)
 
-### Key Observations
+| Setting | Best Strategy | Expected Reward |
+|---------|---------------|-----------------|
+| Non-associative | Any action | 0.50 |
+| Associative | Case A→action 2, Case B→action 1 | 0.55 |
 
-- **ε=0** (greedy): Converges fastest initially but gets stuck on suboptimal actions
-- **ε=0.1**: Good balance between exploration and exploitation
-- **ε=0.5**: Too much exploration, never fully exploits learned values
+---
+
+## Exercise 2.11: Parameter Study
+
+Figure 2.6 analog for nonstationary bandit. Vectorized for ~50x speedup.
+
+```bash
+python3 exercise_2_11_parameter_study.py
+```
+
+![](exercise_2_11_parameter_study.png)
+
+**Key insight:** Constant step-size methods dominate in nonstationary environments.
